@@ -3,7 +3,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 from datetime import date, timedelta
 from dateutil.parser import parse
 
-def getUpdates():
+def getCSPONUpdate():
   # client / auth
   scope = ['https://spreadsheets.google.com/feeds',
   'https://www.googleapis.com/auth/drive']

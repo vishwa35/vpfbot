@@ -1,13 +1,13 @@
 import schedule
 import time
 from datetime import date, timedelta
+from slackclient import SlackClient
 
 from tokens import SLACK_BOT_TOKEN, SLACK_VERIFICATION_TOKEN
-from slackclient import SlackClient
-from csponsheet import getUpdates
+from csponsheet import getCSPONUpdate
 
 def sendCSPONUpdate():
-  ip_count, ip, l, w, c = getUpdates()
+  ip_count, ip, l, w, c = getCSPONUpdate()
   ipstr, lstr, wstr, cstr = '','','',''
 
   if len(c) > 0:
@@ -25,21 +25,27 @@ def sendCSPONUpdate():
         + ''.join([" - {} | {} | {}\n".format(k, ip[k]["director"], ip[k]["date"]) for k in ip])
         + "Total outstanding emails: {}\n".format(ip_count))
 
-  allText = ("CSPON Updates for the week: *{} - {}*\n\n".format(date.today() - timedelta(8), date.today() - timedelta(1))
-              + cstr + wstr + lstr + ipstr)
+  updates = cstr + wstr + lstr + ipstr
+  if len(updates) is 0:
+    updates = "None!"
 
-  updateMsg = slack_client.api_call(
-    "chat.postMessage",
-    channel='#cspon-f18',
-    text=allText
-  )["message"]
+  allText = ("CSPON Updates for the week: *{} - {}*\n\n".format(date.today() - timedelta(8), date.today() - timedelta(1))
+              + updates)
+
+  print allText
+  # updateMsg = slack_client.api_call(
+  #   "chat.postMessage",
+  #   channel='#cspon-f18',
+  #   text=allText
+  # )["message"]
 
 
 if __name__ == "__main__":
   slack_client = SlackClient(SLACK_BOT_TOKEN)
 
-  schedule.every().tuesday.at("09:15").do(sendCSPONUpdate)
+  schedule.every(30).seconds.do(sendCSPONUpdate)
+  # schedule.every().tuesday.at("09:15").do(sendCSPONUpdate)
   # schedule.every().friday.at("16:01").do(sendFundUpdate)
   while True:
     schedule.run_pending()
-    time.sleep(43200
+    time.sleep(5)

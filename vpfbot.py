@@ -3,7 +3,7 @@ import json
 from collections import defaultdict
 from tokens import SLACK_BOT_TOKEN, SLACK_VERIFICATION_TOKEN
 from slackclient import SlackClient
-from csponsheet import getUpdates
+from csponsheet import getCSPONUpdate
 from datetime import date, timedelta
 from weekly import *
 
