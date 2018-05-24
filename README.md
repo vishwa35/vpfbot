@@ -1,8 +1,10 @@
 # vpfbot
 
+## Scheduled Messages
+
 ### constructing a weekly update message based on a Google Sheet
 
-CSPON Updates for the week: [a week ago] - [yesterday]
+CSPON Updates: [a week ago] - [yesterday]
 
 **Sales Closed** - _HELL YEA! Congrats!_
 - Company | @director | Date
@@ -18,7 +20,18 @@ CSPON Updates for the week: [a week ago] - [yesterday]
 
 - Company | @director | Date
 
-Total outstanding emails: XX
+Total in progress emails: XX
 
 ### weekly updates on our fund status
 
+Raza-Dhanani Fund Updates: [a week ago] - [yesterday]
+
+Since last week: +/-X% | +/-$XX.XX
+
+**Cash Value**: $XXX.XX
+
+**Stock Value**: $XXX.XX
+
+**Total Account Value**: $XXX.XX
+
+> (See the pinned sheet for details!)

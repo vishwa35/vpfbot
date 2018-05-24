@@ -49,7 +49,7 @@ def getCSPONUpdate():
       except ValueError:
         print "IP -- No last email date for {}, {}".format(s.row, s.col)
 
-    if s.value is "W" or s.value is "L" or s.value is "C" :
+    if s.value == "W" or s.value == "L" or s.value == "C" :
       try:
         nDate = parse(cspon.cell(s.row, wlCol).value).date()
         if s.value == "W" and nDate >= lastWeek:
