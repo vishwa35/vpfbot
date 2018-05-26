@@ -83,6 +83,7 @@ if __name__ == "__main__":
 
   schedule.every().tuesday.at("09:15").do(sendCSPONUpdate)
   schedule.every().friday.at("16:01").do(sendRDFundUpdate)
+
   while True:
     schedule.run_pending()
     time.sleep(600)

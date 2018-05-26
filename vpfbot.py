@@ -19,7 +19,7 @@ def verify_slack_token(request_token):
         return make_response("Request contains invalid Slack verification token", 403)
 
 # @app.route("/slack/actions", methods=["POST"])
-# def actions():
+def actions():
 
   form_json = json.loads(request.form["payload"])
   callback_id = form_json['callback_id']
@@ -29,13 +29,9 @@ def verify_slack_token(request_token):
 
   return make_response("", 200)
 
-# @app.route("/slack/cspon", methods=["POST"])
-# def cspon():
-#   result = sendCSPONUpdate()
-#   return make_response("", 200)
-
-# @app.route("/slack/venmo", methods=["POST"])
-# def venmo():
+# @app.route("/slack/budget", methods=["POST"])
+# def budget():
+  # link budget in ephemeral (?) message
   # return make_response("", 200)
 
 # Start the Flask server

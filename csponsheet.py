@@ -23,7 +23,7 @@ def getCSPONUpdate():
   initialEmailCol = cspon.find("Initial Email Date").col
   lastEmailCol = cspon.find("Last Email Date").col
   eventCol = cspon.find("Target Event?").col
-  wlCol = cspon.find("Win/Loss Date").col
+  wlCol = cspon.find("Win/Loss/Close/Call Date").col
 
   # gets first 200 rows of contacts
   saleStatuses = cspon.range(baseR, baseC, baseR + 200, baseC)
@@ -49,16 +49,16 @@ def getCSPONUpdate():
       except ValueError:
         print "IP -- No last email date for {}, {}".format(s.row, s.col)
 
-    if s.value == "W" or s.value == "L" or s.value == "C" :
+    if s.value == "W" or s.value == "L" or s.value == "SC" :
       try:
         nDate = parse(cspon.cell(s.row, wlCol).value).date()
         if s.value == "W" and nDate >= lastWeek:
           w[cspon.cell(s.row, companyCol).value] = {"director": cspon.cell(s.row, directorCol).value, "date": nDate}
         elif s.value == "L" and nDate >= lastWeek:
           l[cspon.cell(s.row, companyCol).value] = {"director": cspon.cell(s.row, directorCol).value, "date": nDate}
-        elif s.value == "C" and nDate >= lastWeek:
+        elif s.value == "SC" and nDate >= lastWeek:
           c[cspon.cell(s.row, companyCol).value] = {"director": cspon.cell(s.row, directorCol).value, "date": nDate}
       except ValueError:
-        print "W/L/C -- No date for {}, {}".format(s.row, s.col)
+        print "W/L/SC -- No date for {}, {}".format(s.row, s.col)
 
   return ipcount, ip, l, w, c
