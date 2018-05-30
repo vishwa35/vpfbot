@@ -1,0 +1,27 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[dev-packages]
+
+[packages]
+certifi = "==2018.4.16"
+chardet = "==3.0.4"
+gspread = "==3.0.0"
+"httplib2" = "==0.11.3"
+idna = "==2.6"
+"oauth2client" = "==4.1.2"
+"pyasn1" = "==0.4.2"
+"pyasn1-modules" = "==0.2.1"
+python-dateutil = "==2.7.3"
+requests = "==2.18.4"
+rsa = "==3.4.2"
+schedule = "==0.5.0"
+six = "==1.11.0"
+slackclient = "==1.2.1"
+"urllib3" = "==1.22"
+websocket-client = "==0.47.0"
+
+[requires]
+python_version = "2.7"
