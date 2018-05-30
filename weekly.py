@@ -83,12 +83,13 @@ def sendRDFundUpdate():
 if __name__ == "__main__":
   SLACK_BOT_TOKEN = os.environ['SLACK_BOT_TOKEN']
   SLACK_VERIFICATION_TOKEN = os.environ['SLACK_VERIFICATION_TOKEN']
+  print os.environ['MENTIONS']
   MENTIONS = json.loads(os.environ['MENTIONS'])
   slack_client = SlackClient(SLACK_BOT_TOKEN)
 
   # # For testing
   schedule.every(30).seconds.do(sendCSPONUpdate)
-  # schedule.every(30).seconds.do(sendRDFundUpdate)
+  schedule.every(30).seconds.do(sendRDFundUpdate)
 
   schedule.every().tuesday.at("09:15").do(sendCSPONUpdate)
   schedule.every().friday.at("16:01").do(sendRDFundUpdate)
