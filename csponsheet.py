@@ -65,13 +65,11 @@ def getCSPONUpdate(client):
       ccount += 1
       try:
         nDate = parse(row[wlCol - 1]).date()
+        c[row[companyCol - 1]] = {"director": row[directorCol - 1], "date": nDate}
       except ValueError:
         print "C -- No date for {}, {}".format(s.row, s.col)
-        nDate = "no date"
       except IndexError:
         print "C -- No date for {}, {}".format(s.row, s.col)
-        nDate = "no date"
-      c[row[companyCol - 1]] = {"director": row[directorCol - 1], "date": nDate}
 
     elif s.value == "W" or s.value == "L" or s.value == "SC" :
       try:
