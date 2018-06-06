@@ -4,12 +4,12 @@ from datetime import date, timedelta
 from dateutil.parser import parse
 import re
 
-def getRDFundUpdate():
-  # client / auth
-  scope = ['https://spreadsheets.google.com/feeds',
-  'https://www.googleapis.com/auth/drive']
-  creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
-  client = gspread.authorize(creds)
+def getRDFundUpdate(client):
+  # # client / auth
+  # scope = ['https://spreadsheets.google.com/feeds',
+  # 'https://www.googleapis.com/auth/drive']
+  # creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
+  # client = gspread.authorize(creds)
 
   # Get Fund Sheets
   rdspreadsheet = client.open("Raza-Dhanani Fund - 03/2017 onwards")

@@ -22,7 +22,15 @@ CSPON Updates: [a week ago] - [yesterday]
 
 Total in progress emails: XX
 
+**Calls Scheduled** - _Company | @director | Date_ - _Good Luck!_
+
+- Company | @director | Date
+
+Total calls scheduled: XX
+
 ### weekly updates on our fund status
+
+##### [TODO] add special projects fund status
 
 Raza-Dhanani Fund Updates: [a week ago] - [yesterday]
 
@@ -35,3 +43,18 @@ Since last week: +/-X% | +/-$XX.XX
 **Total Account Value**: $XXX.XX
 
 > (See the pinned sheet for details!)
+
+## Externally Triggered Messages
+
+### [TODO] for new applications for special projects funding
+
+## Internally Triggered Messages
+
+### [TODO] @vpf budget
+Returns a link to the current budget
+
+### [TODO] @vpf dues
+Responds in DM with how much your current A/R is based on chapterspot (feasible?)
+
+### [TODO] @vpf venmo request @handle
+Adds row to venmo request sheet with handle and name

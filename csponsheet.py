@@ -1,14 +1,19 @@
+import os, json
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from datetime import date, timedelta
 from dateutil.parser import parse
 
-def getCSPONUpdate():
-  # client / auth
-  scope = ['https://spreadsheets.google.com/feeds',
-  'https://www.googleapis.com/auth/drive']
-  creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
-  client = gspread.authorize(creds)
+def getCSPONUpdate(client):
+  # # client / auth
+  # scope = ['https://spreadsheets.google.com/feeds',
+  # 'https://www.googleapis.com/auth/drive']
+  # js = json.loads(os.environ['GDRIVE_SECRET'].replace("\n", "\\n"))
+  # with open('client_secret.json', 'w') as d:
+  #   json.dump(js, d)
+  # creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
+  # os.remove('client_secret.json')
+  # client = gspread.authorize(creds)
 
   # Get CSpon Sheet
   cspon = client.open("2018-19 Contacts").sheet1
@@ -31,8 +36,10 @@ def getCSPONUpdate():
   # dictionaries to track relevant cases
   ip = {}
   ipcount = 0
+  ccount = 0
   l = {}
   w = {}
+  sc = {}
   c = {}
 
   lastWeek = date.today() - timedelta(7)
@@ -40,25 +47,46 @@ def getCSPONUpdate():
 
   # check all 200 statuses for: IP, W, L, C
   for s in saleStatuses:
+    if s.value != None and s.value != '':
+      row = cspon.row_values(s.row)
     if s.value == "IP":
       ipcount += 1
       try:
-        lastEmail = parse(cspon.cell(s.row, lastEmailCol).value).date()
+        lastEmail = parse(row[lastEmailCol - 1]).date()
         if lastEmail <= fiveDays:
-          ip[cspon.cell(s.row, companyCol).value] = {"director": cspon.cell(s.row, directorCol).value, "date": lastEmail}
+          ip[row[companyCol - 1]] = {"director": row[directorCol - 1], "date": lastEmail}
       except ValueError:
         print "IP -- No last email date for {}, {}".format(s.row, s.col)
-
-    if s.value == "W" or s.value == "L" or s.value == "SC" :
+      except IndexError:
+        print "IP -- No last email date for {}, {}".format(s.row, s.col)
+    elif s.value == "C":
+      ccount += 1
       try:
-        nDate = parse(cspon.cell(s.row, wlCol).value).date()
+        nDate = parse(row[wlCol - 1]).date()
+      except ValueError:
+        print "C -- No date for {}, {}".format(s.row, s.col)
+        nDate = "no date"
+      except IndexError:
+        print "C -- No date for {}, {}".format(s.row, s.col)
+        nDate = "no date"
+      c[row[companyCol - 1]] = {"director": row[directorCol - 1], "date": nDate}
+
+    elif s.value == "W" or s.value == "L" or s.value == "SC" :
+      try:
+        nDate = parse(row[wlCol - 1]).date()
         if s.value == "W" and nDate >= lastWeek:
-          w[cspon.cell(s.row, companyCol).value] = {"director": cspon.cell(s.row, directorCol).value, "date": nDate}
+          w[row[companyCol - 1]] = {"director": row[directorCol - 1], "date": nDate}
         elif s.value == "L" and nDate >= lastWeek:
-          l[cspon.cell(s.row, companyCol).value] = {"director": cspon.cell(s.row, directorCol).value, "date": nDate}
+          l[row[companyCol - 1]] = {"director": row[directorCol - 1], "date": nDate}
         elif s.value == "SC" and nDate >= lastWeek:
-          c[cspon.cell(s.row, companyCol).value] = {"director": cspon.cell(s.row, directorCol).value, "date": nDate}
+          sc[row[companyCol - 1]] = {"director": row[directorCol - 1], "date": nDate}
       except ValueError:
         print "W/L/SC -- No date for {}, {}".format(s.row, s.col)
+      except IndexError:
+        print "W/L/SC -- No date for {}, {}".format(s.row, s.col)
 
-  return ipcount, ip, l, w, c
+
+  return ipcount, ip, l, w, sc, ccount, c
+
+# for testing
+# print getCSPONUpdate()
