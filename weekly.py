@@ -104,13 +104,13 @@ if __name__ == "__main__":
   client = gspread.authorize(creds)
 
   # # For testing
-  schedule.every(30).seconds.do(lambda: sendCSPONUpdate(client, slack_client))
-  schedule.every(30).seconds.do(lambda: sendRDFundUpdate(client, slack_client))
+  # schedule.every(30).seconds.do(lambda: sendCSPONUpdate(client, slack_client))
+  # schedule.every(30).seconds.do(lambda: sendRDFundUpdate(client, slack_client))
 
-  # schedule.every().tuesday.at("09:15").do(sendCSPONUpdate)
-  # schedule.every().friday.at("16:01").do(sendRDFundUpdate)
+  schedule.every().tuesday.at("09:15").do(lambda: sendCSPONUpdate(client, slack_client))
+  schedule.every().friday.at("16:01").do(lambda: sendRDFundUpdate(client, slack_client))
 
   while True:
     schedule.run_pending()
-    # time.sleep(600)
-    time.sleep(5)
+    time.sleep(600)
+    # time.sleep(5)
