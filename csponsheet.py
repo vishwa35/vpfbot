@@ -47,6 +47,7 @@ def getCSPONUpdate(client):
 
   # check all 200 statuses for: IP, W, L, C
   for s in saleStatuses:
+
     if s.value != None and s.value != '':
       row = cspon.row_values(s.row)
     if s.value == "IP":
@@ -59,6 +60,7 @@ def getCSPONUpdate(client):
         print "IP -- No last email date for {}, {}".format(s.row, s.col)
       except IndexError:
         print "IP -- No last email date for {}, {}".format(s.row, s.col)
+
     elif s.value == "C":
       ccount += 1
       try:
