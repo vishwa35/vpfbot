@@ -71,7 +71,7 @@ def sendRDFundUpdate(gclient, slack_client):
   cstr = "```Cash Value: ${}\n".format(round(cashVal, 2))
   sstr = "Stock Value: ${}\n".format(round(stockVal, 2))
   astr = "Total Account Value: ${}```\n".format(round(accountVal, 2))
-  auxstr = ":information_source: (See the pinned sheet for details!)"
+  auxstr = ":information_source: See the pinned sheet for details!"
 
   allText = heading + chstr + cstr + sstr + astr + auxstr
 
