@@ -64,7 +64,7 @@ def sendCSPONUpdate(gclient, slack_client):
 def sendRDFundUpdate(gclient, slack_client):
   cashVal, stockVal, accountVal, percent, absolute = getRDFundUpdate(gclient)
 
-  heading = ("*Fund Updates*: {} - {}\n\n".format(date.today() - timedelta(8), date.today() - timedelta(1)))
+  heading = ("*Fund Updates*: {} - {}\n\n".format((date.today() - timedelta(7)).strftime("%m/%d/%y"), date.today().strftime("%m/%d/%y")))
 
   sign = '+' if absolute >= 0 else '-'
   chstr = "Since last week: *{}{}% | {}${}*\n".format(sign, round(abs(percent), 2), sign, round(abs(absolute), 2))
@@ -107,7 +107,7 @@ if __name__ == "__main__":
   # schedule.every(30).seconds.do(lambda: sendCSPONUpdate(client, slack_client))
   # schedule.every(30).seconds.do(lambda: sendRDFundUpdate(client, slack_client))
 
-  schedule.every().tuesday.at("09:15").do(lambda: sendCSPONUpdate(client, slack_client))
+  schedule.every().monday.at("18:15").do(lambda: sendCSPONUpdate(client, slack_client))
   schedule.every().friday.at("16:01").do(lambda: sendRDFundUpdate(client, slack_client))
 
   while True:
