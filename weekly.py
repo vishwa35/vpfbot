@@ -23,30 +23,30 @@ def sendCSPONUpdate(gclient, slack_client):
   ipstr, lstr, wstr, scstr, cstr = '','','','',''
 
   if len(sc) > 0:
-    scstr = ("*Sales Closed* - _HELL YEA! Congrats!_\n"
-        + ''.join([" - {} | <@{}> | {}\n\n".format(k, MENTIONS[sc[k]["director"]], sc[k]["date"]) for k in sc]))
+    scstr = ("*Sales Closed* :white_check_mark:- _HELL YEA! Congrats!_\n"
+        + ''.join([" - {} | <@{}> | {}\n\n".format(k, MENTIONS[sc[k]["director"]], sc[k]["date"].strftime("%m/%d")) for k in sc]))
   if len(w) > 0:
-    wstr = ("*Wins* - _YAY! Good news :) Remember to see these all the way through!_\n"
-        + ''.join([" - {} | <@{}> | {}\n\n".format(k, MENTIONS[w[k]["director"]], w[k]["date"]) for k in w]))
+    wstr = ("*Wins* :trophy:- _YAY! Good news :) Remember to see these all the way through!_\n"
+        + ''.join([" - {} | <@{}> | {}\n\n".format(k, MENTIONS[w[k]["director"]], w[k]["date"].strftime("%m/%d")) for k in w]))
   if len(l) > 0:
-    lstr = ("*Losses* - _It happens. Please remember to fill out insights from this contact in the sheet. Onwards!_\n"
-        + ''.join([" - {} | <@{}> | {}\n\n".format(k, MENTIONS[l[k]["director"]], l[k]["date"]) for k in l]))
+    lstr = ("*Losses* :no_entry_sign:- _It happens. Please remember to fill out insights from this contact in the sheet. Onwards!_\n"
+        + ''.join([" - {} | <@{}> | {}\n\n".format(k, MENTIONS[l[k]["director"]], l[k]["date"].strftime("%m/%d")) for k in l]))
   if len(ip) > 0:
-    ipstr = ("*In Progress* - _{} | {} | {}_ - _Good work. Remember to keep following up._\n".format("Company", "@director", "Last Contacted Date")
+    ipstr = ("*{} In Progress* :hourglass_flowing_sand:- _{} | {} | {}_ - _Good work. Remember to keep following up._\n".format(ipcount, "Company", "@director", "Last Contacted Date")
         + "> Only those overdue for followup (5 days) are listed here. See the sheet for details\n"
-        + ''.join([" - {} | <@{}> | {}\n".format(k, MENTIONS[ip[k]["director"]], ip[k]["date"]) for k in ip]))
+        + ''.join([" - {} | <@{}> | {}\n".format(k, MENTIONS[ip[k]["director"]], ip[k]["date"].strftime("%m/%d")) for k in ip]))
   if len(c) > 0:
-    cstr = ("*Calls Scheduled* - _{} | {} | {}_ - _Good Luck!_\n".format("Company", "@director", "Date")
-        + ''.join([" - {} | <@{}> | {}\n".format(k, MENTIONS[c[k]["director"]], c[k]["date"]) for k in c]))
+    cstr = ("*{} Calls Scheduled* :slack_call:- _{} | {} | {}_ - _Good Luck!_\n".format(ccount, "Company", "@director", "Date")
+        + ''.join([" - {} | <@{}> | {}\n".format(k, MENTIONS[c[k]["director"]], c[k]["date"].strftime("%m/%d")) for k in c]))
 
-  ipstr = ipstr + "Total in progress emails: {}\n".format(ipcount)
-  cstr = cstr + "Total calls scheduled: {}\n".format(ccount)
+  # ipstr = ipstr + "Total in progress emails: {}\n".format(ipcount)
+  # cstr = cstr + "Total calls scheduled: {}\n".format(ccount)
 
   updates = scstr + wstr + lstr + ipstr + cstr
   if len(updates) is 0:
     updates = "None!"
 
-  allText = ("*CSPON Updates*: {} - {}\n\n".format((date.today() - timedelta(8)).strftime("%m/%d/%y"), (date.today() - timedelta(1)).strftime("%m/%d/%y"))
+  allText = (":information_source: *CSPON Updates*: {} - {}\n\n".format((date.today() - timedelta(8)).strftime("%m/%d/%y"), (date.today() - timedelta(1)).strftime("%m/%d/%y"))
               + updates)
 
   # print allText
@@ -64,14 +64,14 @@ def sendCSPONUpdate(gclient, slack_client):
 def sendRDFundUpdate(gclient, slack_client):
   cashVal, stockVal, accountVal, percent, absolute = getRDFundUpdate(gclient)
 
-  heading = ("*Fund Updates*: {} - {}\n\n".format((date.today() - timedelta(7)).strftime("%m/%d/%y"), date.today().strftime("%m/%d/%y")))
+  heading = (":moneybag: *Fund Updates*: {} - {}\n\n".format((date.today() - timedelta(7)).strftime("%m/%d/%y"), date.today().strftime("%m/%d/%y")))
 
   sign = '+' if absolute >= 0 else '-'
   chstr = "Since last week: *{}{}% | {}${}*\n".format(sign, round(abs(percent), 2), sign, round(abs(absolute), 2))
   cstr = "```Cash Value: ${}\n".format(round(cashVal, 2))
   sstr = "Stock Value: ${}\n".format(round(stockVal, 2))
   astr = "Total Account Value: ${}```\n".format(round(accountVal, 2))
-  auxstr = "(See the pinned sheet for details!)"
+  auxstr = ":information_source: (See the pinned sheet for details!)"
 
   allText = heading + chstr + cstr + sstr + astr + auxstr
 
