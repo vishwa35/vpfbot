@@ -106,16 +106,16 @@ if __name__ == "__main__":
   logging.debug("authorized to google")
 
   # # For testing
-  # schedule.every(30).seconds.do(lambda: sendCSPONUpdate(client, slack_client))
-  # schedule.every(30).seconds.do(lambda: sendRDFundUpdate(client, slack_client))
+  schedule.every(60).seconds.do(lambda: sendCSPONUpdate(client, slack_client))
+  schedule.every(60).seconds.do(lambda: sendRDFundUpdate(client, slack_client))
 
-  schedule.every().monday.at("18:15").do(lambda: sendCSPONUpdate(client, slack_client))
-  schedule.every().friday.at("16:01").do(lambda: sendRDFundUpdate(client, slack_client))
+  # schedule.every().monday.at("18:15").do(lambda: sendCSPONUpdate(client, slack_client))
+  # schedule.every().friday.at("16:01").do(lambda: sendRDFundUpdate(client, slack_client))
   logging.info("entering run loop")
 
   while True:
     if creds.access_token_expired:
       client.login()  # refreshes the token
     schedule.run_pending()
-    time.sleep(600)
-    # time.sleep(5)
+    # time.sleep(600)
+    time.sleep(5)
