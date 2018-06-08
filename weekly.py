@@ -97,11 +97,11 @@ if __name__ == "__main__":
   scope = ['https://spreadsheets.google.com/feeds',
   'https://www.googleapis.com/auth/drive']
   js = json.loads(os.environ['GDRIVE_SECRET'].replace("\n", "\\n"))
-  with open('client_secret.json', 'w') as d:
+  with open('secret.json', 'w') as d:
     json.dump(js, d)
-  creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
-  os.remove('client_secret.json')
+  creds = ServiceAccountCredentials.from_json_keyfile_name('secret.json', scope)
   client = gspread.authorize(creds)
+  os.remove('secret.json')
 
   # # For testing
   # schedule.every(30).seconds.do(lambda: sendCSPONUpdate(client, slack_client))
@@ -111,6 +111,8 @@ if __name__ == "__main__":
   schedule.every().friday.at("16:01").do(lambda: sendRDFundUpdate(client, slack_client))
 
   while True:
+    if creds.access_token_expired:
+      client.login()  # refreshes the token
     schedule.run_pending()
     time.sleep(600)
     # time.sleep(5)
