@@ -24,20 +24,20 @@ def sendCSPONUpdate(gclient, slack_client):
 
   if len(sc) > 0:
     scstr = ("*Sales Closed* :white_check_mark:- _HELL YEA! Congrats!_\n"
-        + ''.join([" - {} | <@{}> | {}\n\n".format(k, MENTIONS[sc[k]["director"]], sc[k]["date"].strftime("%m/%d")) for k in sc]))
+        + ''.join([" - {} | <@{}> | {}\n\n".format(k, MENTIONS[sc[k]["director"]], (sc[k]["date"]).strftime("%m/%d")) for k in sc]))
   if len(w) > 0:
     wstr = ("*Wins* :trophy:- _YAY! Good news :) Remember to see these all the way through!_\n"
-        + ''.join([" - {} | <@{}> | {}\n\n".format(k, MENTIONS[w[k]["director"]], w[k]["date"].strftime("%m/%d")) for k in w]))
+        + ''.join([" - {} | <@{}> | {}\n\n".format(k, MENTIONS[w[k]["director"]], (w[k]["date"]).strftime("%m/%d")) for k in w]))
   if len(l) > 0:
     lstr = ("*Losses* :no_entry_sign:- _It happens. Please remember to fill out insights from this contact in the sheet. Onwards!_\n"
-        + ''.join([" - {} | <@{}> | {}\n\n".format(k, MENTIONS[l[k]["director"]], l[k]["date"].strftime("%m/%d")) for k in l]))
+        + ''.join([" - {} | <@{}> | {}\n\n".format(k, MENTIONS[l[k]["director"]], (l[k]["date"]).strftime("%m/%d")) for k in l]))
   if len(ip) > 0:
     ipstr = ("*{} In Progress* :hourglass_flowing_sand:- _{} | {} | {}_ - _Good work. Remember to keep following up._\n".format(ipcount, "Company", "@director", "Last Contacted Date")
         + "> Only those overdue for followup (5 days) are listed here. See the sheet for details\n"
-        + ''.join([" - {} | <@{}> | {}\n".format(k, MENTIONS[ip[k]["director"]], ip[k]["date"].strftime("%m/%d")) for k in ip]))
+        + ''.join([" - {} | <@{}> | {}\n".format(k, MENTIONS[ip[k]["director"]], (ip[k]["date"]).strftime("%m/%d")) for k in ip]))
   if len(c) > 0:
     cstr = ("*{} Calls Scheduled* :slack_call:- _{} | {} | {}_ - _Good Luck!_\n".format(ccount, "Company", "@director", "Date")
-        + ''.join([" - {} | <@{}> | {}\n".format(k, MENTIONS[c[k]["director"]], c[k]["date"].strftime("%m/%d")) for k in c]))
+        + ''.join([" - {} | <@{}> | {}\n".format(k, MENTIONS[c[k]["director"]], (c[k]["date"]).strftime("%m/%d")) for k in c]))
 
   # ipstr = ipstr + "Total in progress emails: {}\n".format(ipcount)
   # cstr = cstr + "Total calls scheduled: {}\n".format(ccount)
