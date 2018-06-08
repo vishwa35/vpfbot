@@ -93,6 +93,7 @@ if __name__ == "__main__":
   # print os.environ['MENTIONS']
   MENTIONS = json.loads(os.environ['MENTIONS'])
   slack_client = SlackClient(SLACK_BOT_TOKEN)
+  logging.debug("authorized slack client")
 
   scope = ['https://spreadsheets.google.com/feeds',
   'https://www.googleapis.com/auth/drive']
@@ -102,6 +103,7 @@ if __name__ == "__main__":
   creds = ServiceAccountCredentials.from_json_keyfile_name('secret.json', scope)
   client = gspread.authorize(creds)
   os.remove('secret.json')
+  logging.debug("authorized to google")
 
   # # For testing
   # schedule.every(30).seconds.do(lambda: sendCSPONUpdate(client, slack_client))
@@ -109,6 +111,7 @@ if __name__ == "__main__":
 
   schedule.every().monday.at("18:15").do(lambda: sendCSPONUpdate(client, slack_client))
   schedule.every().friday.at("16:01").do(lambda: sendRDFundUpdate(client, slack_client))
+  logging.info("entering run loop")
 
   while True:
     if creds.access_token_expired:
