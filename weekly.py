@@ -52,7 +52,7 @@ def sendCSPONUpdate(gclient, slack_client):
   # print allText
   updateMsg = slack_client.api_call(
     "chat.postMessage",
-    channel='#slackbot-test',
+    channel='#cspon-f18',
     text=allText
   )
 
@@ -78,7 +78,7 @@ def sendRDFundUpdate(gclient, slack_client):
   # print allText
   updateMsg = slack_client.api_call(
     "chat.postMessage",
-    channel='#slackbot-test',
+    channel='#the-fund',
     text=allText
   )
 
