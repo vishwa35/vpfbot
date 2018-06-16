@@ -30,8 +30,11 @@ def getCSPONUpdate(client):
   eventCol = cspon.find("Target Event?").col
   wlCol = cspon.find("Win/Loss/Close/Call Date").col
 
-  # gets first 200 rows of contacts
-  saleStatuses = cspon.range(baseR, baseC, baseR + 200, baseC)
+  cols = [directorCol, companyCol, initialEmailCol, lastEmailCol, eventCol, wlCol]
+  lastCol = max(cols)
+  # gets first n rows of contacts
+  n = 200
+  saleStatuses = cspon.range(baseR, baseC, baseR + n, lastCol)
 
   # dictionaries to track relevant cases
   ip = {}
@@ -45,17 +48,16 @@ def getCSPONUpdate(client):
   lastWeek = date.today() - timedelta(7)
   fiveDays = date.today() - timedelta(5)
 
-  # check all 200 statuses for: IP, W, L, C
-  for s in saleStatuses:
-
-    if s.value != None and s.value != '':
-      row = cspon.row_values(s.row)
+  # check all 200 statuses for: IP, W, L, SC, C
+  for x in xrange(n):
+    s = saleStatuses[x*(lastCol - 1)]
+    row = saleStatuses[x*(lastCol - 1) : (x+1)*(lastCol - 1)]
     if s.value == "IP":
       ipcount += 1
       try:
-        lastEmail = parse(row[lastEmailCol - 1]).date()
+        lastEmail = parse(row[lastEmailCol - 2].value).date()
         if lastEmail <= fiveDays:
-          ip[row[companyCol - 1]] = {"director": row[directorCol - 1], "date": lastEmail}
+          ip[row[companyCol + 1].value] = {"director": row[directorCol - 2].value, "date": lastEmail}
       except ValueError:
         print "IP -- No last email date for {}, {}".format(s.row, s.col)
       except IndexError:
@@ -64,8 +66,9 @@ def getCSPONUpdate(client):
     elif s.value == "C":
       ccount += 1
       try:
-        nDate = parse(row[wlCol - 1]).date()
-        c[row[companyCol - 1]] = {"director": row[directorCol - 1], "date": nDate}
+        nDate = parse(row[wlCol - 2].value).date()
+        if nDate is None or nDate >= lastWeek:
+          c[row[companyCol + 1].value] = {"director": row[directorCol - 2].value, "date": nDate}
       except ValueError:
         print "C -- No date for {}, {}".format(s.row, s.col)
       except IndexError:
@@ -73,13 +76,13 @@ def getCSPONUpdate(client):
 
     elif s.value == "W" or s.value == "L" or s.value == "SC" :
       try:
-        nDate = parse(row[wlCol - 1]).date()
+        nDate = parse(row[wlCol - 2].value).date()
         if s.value == "W" and nDate >= lastWeek:
-          w[row[companyCol - 1]] = {"director": row[directorCol - 1], "date": nDate}
+          w[row[companyCol + 1].value] = {"director": row[directorCol - 2].value, "date": nDate}
         elif s.value == "L" and nDate >= lastWeek:
-          l[row[companyCol - 1]] = {"director": row[directorCol - 1], "date": nDate}
+          l[row[companyCol + 1].value] = {"director": row[directorCol - 2].value, "date": nDate}
         elif s.value == "SC" and nDate >= lastWeek:
-          sc[row[companyCol - 1]] = {"director": row[directorCol - 1], "date": nDate}
+          sc[row[companyCol + 1].value] = {"director": row[directorCol - 2].value, "date": nDate}
       except ValueError:
         print "W/L/SC -- No date for {}, {}".format(s.row, s.col)
       except IndexError:
@@ -88,5 +91,22 @@ def getCSPONUpdate(client):
 
   return ipcount, ip, l, w, sc, ccount, c
 
-# for testing
-# print getCSPONUpdate()
+
+# # for testing
+# scope = ['https://spreadsheets.google.com/feeds',
+#   'https://www.googleapis.com/auth/drive']
+# js = json.loads(os.environ['GDRIVE_SECRET'].replace("\n", "\\n"))
+# with open('secret.json', 'w') as d:
+#   json.dump(js, d)
+# creds = ServiceAccountCredentials.from_json_keyfile_name('secret.json', scope)
+# client = gspread.authorize(creds)
+# os.remove('secret.json')
+
+# ipcount, ip, l, w, sc, ccount, c = getCSPONUpdate(client)
+# print "ipcount: ", ipcount
+# print "IP: ", ip
+# print "L: ", l
+# print "W: ", w
+# print "SC: ", sc
+# print "ccount: ", ccount
+# print "C: ", c

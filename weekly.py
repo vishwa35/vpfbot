@@ -10,7 +10,7 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
 from csponsheet import getCSPONUpdate
-from fundsheet import getRDFundUpdate
+from fundsheet import getRDFundUpdate, getPFundUpdate
 
 logging.basicConfig(level=logging.DEBUG)
 # set MENTIONS env var with the following format
@@ -32,11 +32,11 @@ def sendCSPONUpdate(gclient, slack_client):
     lstr = ("*Losses* :no_entry_sign:- _It happens. Please remember to fill out insights from this contact in the sheet. Onwards!_\n"
         + ''.join([" - {} | <@{}> | {}\n\n".format(k, MENTIONS[l[k]["director"]], (l[k]["date"]).strftime("%m/%d")) for k in l]))
   if len(ip) > 0:
-    ipstr = ("*{} In Progress* :hourglass_flowing_sand:- _{} | {} | {}_ - _Good work. Remember to keep following up._\n".format(ipcount, "Company", "@director", "Last Contacted Date")
+    ipstr = ("*{} In Progress* :hourglass_flowing_sand:- _{} | {} | {}_ - _Good stuff. Remember to keep following up._\n".format(ipcount, "Company", "@director", "Last Contacted Date")
         + "> Only those overdue for followup (5 days) are listed here. See the sheet for details\n"
         + ''.join([" - {} | <@{}> | {}\n".format(k, MENTIONS[ip[k]["director"]], (ip[k]["date"]).strftime("%m/%d")) for k in ip]))
   if len(c) > 0:
-    cstr = ("*{} Calls Scheduled* :slack_call:- _{} | {} | {}_ - _Good Luck!_\n".format(ccount, "Company", "@director", "Date")
+    cstr = ("*{} In Call Stage* :slack_call:- _{} | {} | {}_ - _Good Luck!_\n".format(ccount, "Company", "@director", "Date")
         + ''.join([" - {} | <@{}> | {}\n".format(k, MENTIONS[c[k]["director"]], (c[k]["date"]).strftime("%m/%d")) for k in c]))
 
   # ipstr = ipstr + "Total in progress emails: {}\n".format(ipcount)
@@ -53,6 +53,7 @@ def sendCSPONUpdate(gclient, slack_client):
   updateMsg = slack_client.api_call(
     "chat.postMessage",
     channel='#cspon-f18',
+    # channel='#slackbot-test',
     text=allText
   )
 
@@ -61,24 +62,37 @@ def sendCSPONUpdate(gclient, slack_client):
   else:
     logging.debug(updateMsg)
 
-def sendRDFundUpdate(gclient, slack_client):
-  cashVal, stockVal, accountVal, percent, absolute = getRDFundUpdate(gclient)
-
+def sendFundUpdate(gclient, slack_client):
   heading = (":moneybag: *Fund Updates*: {} - {}\n\n".format((date.today() - timedelta(7)).strftime("%m/%d/%y"), date.today().strftime("%m/%d/%y")))
 
+  cashVal, stockVal, accountVal, percent, absolute = getRDFundUpdate(gclient)
+  fname = "_Raza Dhanani Fund:_ "
   sign = '+' if absolute >= 0 else '-'
-  chstr = "Since last week: *{}{}% | {}${}*\n".format(sign, round(abs(percent), 2), sign, round(abs(absolute), 2))
+  chstr = "*{}{}% | {}${}* (since last week)\n".format(sign, round(abs(percent), 2), sign, round(abs(absolute), 2))
   cstr = "```Cash Value: ${}\n".format(round(cashVal, 2))
   sstr = "Stock Value: ${}\n".format(round(stockVal, 2))
   astr = "Total Account Value: ${}```\n".format(round(accountVal, 2))
-  auxstr = ":information_source: See the pinned sheet for details!"
 
-  allText = heading + chstr + cstr + sstr + astr + auxstr
+  rdText = fname + chstr + cstr + sstr + astr
+
+  cashVal, stockVal, accountVal, percent, absolute = getPFundUpdate(gclient)
+  fname = "_Phoenician Fund:_ "
+  sign = '+' if absolute >= 0 else '-'
+  chstr = "*{}{}% | {}${}* (since last week)\n".format(sign, round(abs(percent), 2), sign, round(abs(absolute), 2))
+  cstr = "```Cash Value: ${}\n".format(round(cashVal, 2))
+  sstr = "Stock Value: ${}\n".format(round(stockVal, 2))
+  astr = "Total Account Value: ${}```\n".format(round(accountVal, 2))
+
+  pfText = fname + chstr + cstr + sstr + astr
+
+  auxstr = ":information_source: See the pinned sheets for details!"
+  allText = heading + rdText + pfText + auxstr
 
   # print allText
   updateMsg = slack_client.api_call(
     "chat.postMessage",
     channel='#the-fund',
+    # channel='#slackbot-test',
     text=allText
   )
 
@@ -107,10 +121,10 @@ if __name__ == "__main__":
 
   # # For testing
   # schedule.every(60).seconds.do(lambda: sendCSPONUpdate(client, slack_client))
-  # schedule.every(60).seconds.do(lambda: sendRDFundUpdate(client, slack_client))
+  # schedule.every(60).seconds.do(lambda: sendFundUpdate(client, slack_client))
 
   schedule.every().monday.at("13:15").do(lambda: sendCSPONUpdate(client, slack_client))
-  schedule.every().friday.at("20:01").do(lambda: sendRDFundUpdate(client, slack_client))
+  schedule.every().friday.at("20:01").do(lambda: sendFundUpdate(client, slack_client))
   logging.info("entering run loop")
 
   while True:
