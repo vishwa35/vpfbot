@@ -123,7 +123,7 @@ if __name__ == "__main__":
   # schedule.every(60).seconds.do(lambda: sendCSPONUpdate(client, slack_client))
   # schedule.every(60).seconds.do(lambda: sendFundUpdate(client, slack_client))
 
-  schedule.every().monday.at("13:15").do(lambda: sendCSPONUpdate(client, slack_client))
+  # schedule.every().monday.at("13:15").do(lambda: sendCSPONUpdate(client, slack_client))
   schedule.every().friday.at("20:01").do(lambda: sendFundUpdate(client, slack_client))
   logging.info("entering run loop")
 
