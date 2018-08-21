@@ -168,6 +168,7 @@ if __name__ == "__main__":
   SLACK_VERIFICATION_TOKEN = os.environ['SLACK_VERIFICATION_TOKEN']
   # print os.environ['MENTIONS']
   MENTIONS = json.loads(os.environ['MENTIONS'])
+  slackids = json.loads(os.environ['NAME2SLACK'])
   slack_client = SlackClient(SLACK_BOT_TOKEN)
   logging.debug("authorized slack client")
   scope = ['https://spreadsheets.google.com/feeds',
@@ -178,9 +179,9 @@ if __name__ == "__main__":
   creds = ServiceAccountCredentials.from_json_keyfile_name('secret.json', scope)
   client = gspread.authorize(creds)
 
-  slackids = {}
-  with open('name2slack.json', 'rb') as afile:
-    slackids = json.load(afile)
+  # slackids = {}
+  # with open('name2slack.json', 'rb') as afile:
+  #   slackids = json.load(afile)
 
   os.remove('secret.json')
 
@@ -190,8 +191,12 @@ if __name__ == "__main__":
   store = file.Storage('token.json')
   creds = store.get()
   if not creds or creds.invalid:
-      flow = oauth_client.flow_from_clientsecrets('credentials.json', SCOPES)
-      creds = tools.run_flow(flow, store)
+    credentialsjson = json.loads(os.environ['CREDENTIALS'].replace("\n", "\\n"))
+    with open('credentials.json', 'w') as d:
+      json.dump(credentialsjson, d)
+    flow = oauth_client.flow_from_clientsecrets('credentials.json', SCOPES)
+    creds = tools.run_flow(flow, store)
+    os.remove('credentials.json')
   service = build('gmail', 'v1', http=creds.authorize(Http()))
 
   logging.debug("authorized to google")
