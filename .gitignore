@@ -1,3 +1,7 @@
+DS_STORE
 *.json
 vpf/
 *.pyc
+slackids.json
+list.json
+balances.csv

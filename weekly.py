@@ -3,11 +3,15 @@ import json
 import schedule
 import time
 import logging
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from slackclient import SlackClient
 
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+from googleapiclient.discovery import build
+from httplib2 import Http
+from oauth2client import file, tools
+from oauth2client import client as oauth_client
 
 from csponsheet import getCSPONUpdate
 from fundsheet import getRDFundUpdate, getPFundUpdate
@@ -101,6 +105,64 @@ def sendFundUpdate(gclient, slack_client):
   else:
     logging.debug(updateMsg)
 
+def checkGmailForVenmo(service, slackids, slack_client, lastchecked):
+  paymentsLabel = 'Label_1'
+  venmoSlackLabel = 'Label_830267486826221758'
+  # Call the Gmail API
+  logging.debug("Last Checked: {}".format(lastchecked))
+  lastchecked = datetime.now()
+  d = lastchecked.strftime('%Y/%m/%d')
+
+  results = service.users().messages().list(userId='me', q='from:(venmo@venmo.com) AND "paid you" AND after:{} AND NOT label:venmo-slack '.format(d)).execute()
+  messages = results.get('messages', [])
+  for m in messages:
+    # print m
+    metadata = service.users().messages().get(userId='me', id=m['id'], format='metadata', metadataHeaders='Subject').execute()
+    if venmoSlackLabel not in metadata['labelIds']:
+      emailid = metadata["id"]
+      subj = metadata["payload"]["headers"][0]["value"]
+      splitstring = subj.split("paid you")
+      splitstring = list(map(lambda x: x.rstrip().lstrip(), splitstring))
+      if splitstring[0] in slackids.keys():
+        uid = slackids[splitstring[0]]
+        msg = "Received a Venmo payment of {}. (ID: {})".format(splitstring[1], emailid)
+        openChannel = slack_client.api_call(
+          "conversations.open",
+          users=uid
+        )
+        sendMsg = slack_client.api_call(
+          "chat.postMessage",
+          channel=openChannel["channel"]["id"],
+          text=msg
+        )
+        service.users().messages().modify(userId='me', id=m['id'], body={'removeLabelIds': ['INBOX'], 'addLabelIds': [paymentsLabel, venmoSlackLabel]}).execute()
+
+        if sendMsg['ok'] is not True:
+          logging.error(sendMsg)
+        else:
+          logging.debug(sendMsg)
+  return lastchecked
+
+def ListMessagesMatchingQuery(service, user_id, query=''):
+  try:
+    response = service.users().messages().list(userId=user_id,
+                                               q=query).execute()
+    messages = []
+    if 'messages' in response:
+      messages.extend(response['messages'])
+
+    while 'nextPageToken' in response:
+      page_token = response['nextPageToken']
+      response = service.users().messages().list(userId=user_id, q=query,
+                                         pageToken=page_token).execute()
+      messages.extend(response['messages'])
+
+    return messages
+  except errors.HttpError, error:
+    print 'An error occurred: %s' % error
+
+
+
 if __name__ == "__main__":
   SLACK_BOT_TOKEN = os.environ['SLACK_BOT_TOKEN']
   SLACK_VERIFICATION_TOKEN = os.environ['SLACK_VERIFICATION_TOKEN']
@@ -108,7 +170,6 @@ if __name__ == "__main__":
   MENTIONS = json.loads(os.environ['MENTIONS'])
   slack_client = SlackClient(SLACK_BOT_TOKEN)
   logging.debug("authorized slack client")
-
   scope = ['https://spreadsheets.google.com/feeds',
   'https://www.googleapis.com/auth/drive']
   js = json.loads(os.environ['GDRIVE_SECRET'].replace("\n", "\\n"))
@@ -116,8 +177,29 @@ if __name__ == "__main__":
     json.dump(js, d)
   creds = ServiceAccountCredentials.from_json_keyfile_name('secret.json', scope)
   client = gspread.authorize(creds)
+
+  slackids = {}
+  with open('name2slack.json', 'rb') as afile:
+    slackids = json.load(afile)
+
   os.remove('secret.json')
+
+# copy paste quickstart
+
+  SCOPES = 'https://www.googleapis.com/auth/gmail.modify'
+  store = file.Storage('token.json')
+  creds = store.get()
+  if not creds or creds.invalid:
+      flow = oauth_client.flow_from_clientsecrets('credentials.json', SCOPES)
+      creds = tools.run_flow(flow, store)
+  service = build('gmail', 'v1', http=creds.authorize(Http()))
+
   logging.debug("authorized to google")
+
+  LASTCHECKED = (datetime.today() - timedelta(days=1))
+  LASTCHECKED = checkGmailForVenmo(service, slackids, slack_client, LASTCHECKED)
+  # m = ListMessagesMatchingQuery(service, 'me', 'from:(venmo@venmo.com) "paid you" after:2018/8/20')
+  # print m
 
   # # For testing
   # schedule.every(60).seconds.do(lambda: sendCSPONUpdate(client, slack_client))
@@ -125,11 +207,12 @@ if __name__ == "__main__":
 
   # schedule.every().monday.at("13:15").do(lambda: sendCSPONUpdate(client, slack_client))
   schedule.every().friday.at("20:01").do(lambda: sendFundUpdate(client, slack_client))
+  schedule.every(1).minutes.do(lambda: checkGmailForVenmo(service, slackids, slack_client, LASTCHECKED))
   logging.info("entering run loop")
 
   while True:
     if creds.access_token_expired:
       client.login()  # refreshes the token
     schedule.run_pending()
-    time.sleep(600)
+    # time.sleep(600)
     # time.sleep(5)
