@@ -207,12 +207,12 @@ if __name__ == "__main__":
 
   # schedule.every().monday.at("13:15").do(lambda: sendCSPONUpdate(client, slack_client))
   schedule.every().friday.at("20:01").do(lambda: sendFundUpdate(client, slack_client))
-  schedule.every(1).minutes.do(lambda: checkGmailForVenmo(service, slackids, slack_client, LASTCHECKED))
+  schedule.every(30).minutes.do(lambda: checkGmailForVenmo(service, slackids, slack_client, LASTCHECKED))
   logging.info("entering run loop")
 
   while True:
     if creds.access_token_expired:
       client.login()  # refreshes the token
     schedule.run_pending()
-    # time.sleep(600)
+    time.sleep(600)
     # time.sleep(5)
