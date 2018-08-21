@@ -1,1 +1,1 @@
-worker: python weekly.py -p $PORT
+worker: python weekly.py --noauth_local_webserver -p $PORT
