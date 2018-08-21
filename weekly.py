@@ -105,13 +105,12 @@ def sendFundUpdate(gclient, slack_client):
   else:
     logging.debug(updateMsg)
 
-def checkGmailForVenmo(service, slackids, slack_client, lastchecked):
+def checkGmailForVenmo(service, slackids, slack_client):
   paymentsLabel = 'Label_1'
   venmoSlackLabel = 'Label_830267486826221758'
   # Call the Gmail API
-  logging.debug("Last Checked: {}".format(lastchecked))
-  lastchecked = datetime.now()
-  d = lastchecked.strftime('%Y/%m/%d')
+  yesterday = (datetime.today() - timedelta(days=1))
+  d = yesterday.strftime('%Y/%m/%d')
 
   results = service.users().messages().list(userId='me', q='from:(venmo@venmo.com) AND "paid you" AND after:{} AND NOT label:venmo-slack '.format(d)).execute()
   messages = results.get('messages', [])
@@ -141,7 +140,6 @@ def checkGmailForVenmo(service, slackids, slack_client, lastchecked):
           logging.error(sendMsg)
         else:
           logging.debug(sendMsg)
-  return lastchecked
 
 def ListMessagesMatchingQuery(service, user_id, query=''):
   try:
@@ -185,6 +183,9 @@ if __name__ == "__main__":
 
   os.remove('secret.json')
 
+  js = json.loads(os.environ['TOKEN'].replace("\n", "\\n"))
+  with open('token.json', 'w') as d:
+    json.dump(js, d)
 # copy paste quickstart
 
   SCOPES = 'https://www.googleapis.com/auth/gmail.modify'
@@ -201,8 +202,8 @@ if __name__ == "__main__":
 
   logging.debug("authorized to google")
 
-  LASTCHECKED = (datetime.today() - timedelta(days=1))
-  LASTCHECKED = checkGmailForVenmo(service, slackids, slack_client, LASTCHECKED)
+
+  checkGmailForVenmo(service, slackids, slack_client)
   # m = ListMessagesMatchingQuery(service, 'me', 'from:(venmo@venmo.com) "paid you" after:2018/8/20')
   # print m
 
@@ -212,7 +213,7 @@ if __name__ == "__main__":
 
   # schedule.every().monday.at("13:15").do(lambda: sendCSPONUpdate(client, slack_client))
   schedule.every().friday.at("20:01").do(lambda: sendFundUpdate(client, slack_client))
-  schedule.every(30).minutes.do(lambda: checkGmailForVenmo(service, slackids, slack_client, LASTCHECKED))
+  schedule.every(30).minutes.do(lambda: checkGmailForVenmo(service, slackids, slack_client))
   logging.info("entering run loop")
 
   while True:
