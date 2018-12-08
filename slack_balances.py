@@ -24,7 +24,7 @@ if __name__ == "__main__":
 
   logging.info("entering run loop")
 
-  with open('balances.csv', 'rb') as csvfile:
+  with open('daybeforecogs.csv', 'rb') as csvfile:
     members = csv.reader(csvfile)
     for mem in members:
       if mem[2] == "Collegiate":
@@ -58,8 +58,12 @@ if __name__ == "__main__":
           firstduesmsg = "Time for Fall 2018 Dues! :flying_money_with_wings: You currently owe *${}*-- please venmo :venmo: @gtakpsi, pay via check, or pay on chapterspot.com (+3% transaction fee). Due August 30!\n>Note: If you venmo, you should receive a confirmation message within 30 (or so) minutes! If you think there is an error, please slack @vishwa. If you would like a payment plan, please fill out this form: https://goo.gl/forms/MXbsr1FnMu5obJQM2".format(amt)
           # dayofmsg = "Fall 2018 Dues are due *TODAY*! :flying_money_with_wings: You currently owe *${}*-- please venmo :venmo: @gtakpsi, pay via check, or pay on chapterspot.com (+3% transaction fee).\n>Note: If you venmo, you should receive a confirmation message within 30 (or so) minutes! If you think there is an error, please slack @vishwa. If you would like a payment plan, please fill out this form: https://goo.gl/forms/MXbsr1FnMu5obJQM2".format(amt)
           # msg = "Time for Fall 2018 Dues! :flying_money_with_wings: You currently owe ${}-- please venmo :venmo: @gtakpsi, pay via check, or pay on chapterspot.com (+3% transaction fee). Due August 30!".format(amt)
+          # msgAR = "Time for Fall 2018 A/R! :flying_money_with_wings: You currently owe ${}-- please venmo :venmo: @gtakpsi, pay via check, or pay on chapterspot.com (+3% transaction fee). Due November 29 (COGS!)!\n>Note: If you venmo, you should receive a confirmation message within 30 (or so) minutes! If you think there is an error, please slack @vishwa. If you would like a payment plan, please fill out this form: https://goo.gl/forms/MXbsr1FnMu5obJQM2".format(amt)
+          # msgARv2 = "You have pending Fall 2018 A/R! :flying_money_with_wings: You currently owe ${}-- please venmo :venmo: @gtakpsi, pay via check, or pay on chapterspot.com (+3% transaction fee). Due November 29 (COGS!)!\n>Note: Credit has been given for everything remaining (credits are updated as of 1 hour ago), and Blue Sapphire Tshirts have been charged for.If you think there is an error, please check chapterspot and then slack @vishwa. If you would like a payment plan, please fill out this form: https://goo.gl/forms/MXbsr1FnMu5obJQM2".format(amt)
+          msgARv3 = "You have pending Fall 2018 A/R, due *TOMORROW*! :flying_money_with_wings: You currently owe ${}-- please venmo :venmo: @gtakpsi, pay via check, or pay on chapterspot.com (+3% transaction fee). Due November 29 (COGS!)!\n>Note: All charges, credits and fines are updated. If you think there is an error, please check chapterspot and then slack @vishwa. If you would like a payment plan, please fill out this form: https://goo.gl/forms/MXbsr1FnMu5obJQM2".format(amt)
           
-          msg = dayofmsg
+          # CHANGE THIS PER DAY
+          msg = msgARv3
 
           openChannel = slack_client.api_call(
             "conversations.open",
