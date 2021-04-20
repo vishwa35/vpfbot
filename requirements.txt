@@ -59,7 +59,7 @@ placebo==0.8.1
 pluggy==0.6.0
 praw==5.4.0
 prawcore==0.14.0
-py==1.5.3
+py==1.10.0
 pyasn1==0.4.3
 pyasn1-modules==0.2.1
 PyBrain==0.3
